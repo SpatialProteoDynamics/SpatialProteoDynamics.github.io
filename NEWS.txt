@@ -1,0 +1,2 @@
+NEWS v4_26112020:
+-- Updated data files from OSMSTRSS (fixed limma tables, this should not affect the data in previous versions)

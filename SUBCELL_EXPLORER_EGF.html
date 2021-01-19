@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="mystyle.css">
+
+<script src="https://unpkg.com/vue"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+<script src="./plugins/chartjs-plugin-error-bars/build/Plugin.Errorbars.js"></script>
+
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_CTRL.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_2min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_8min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_20min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_90min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_sd_CTRL.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_sd_2min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_sd_8min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_sd_20min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PROT/output/mydata_sd_90min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_CTRL.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_2min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_8min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_20min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_90min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_sd_CTRL.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_sd_2min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_sd_8min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_sd_20min.js"></script>
+<script type="text/javascript" src="./DATA/EGF/PHOS/output/mydata_phos_sd_90min.js"></script>
+
+
+
+<body>
+<head>
+  <title>SUBCELLULAR LOCATION DYNAMICS</title>
+</head>
+<nav>
+	<div class="navbar">
+		<a href="index.html">Home</a>
+		<a>Article</a>
+		<a>Raw data</a>
+		<div class="dropdown">
+				<button class="dropbtn">Explore datasets</button>
+				<div class="dropdown-content">
+				  <a href="SUBCELL_EXPLORER_EGF.html">EGF stimulation-HeLa</a>
+				  <a href="SUBCELL_EXPLORER_EGF_LIVER.html">EGF stimulation-Mouse</a>
+				  <a href="SUBCELL_EXPLORER_OSMSTRSS.html">Osmotic stress-U2OS</a>
+				  <a href="SUBCELL_EXPLORER_MUSCLE.html">Mouse Muscle-Contraction</a>
+				</div>
+		</div>
+		<a sytle="text-align: right" href="contact.html">Contact</a>
+	</div>
+</nav>
+<div class="header">SUBCELLULAR LOCATION DYNAMICS IN RESPONSE TO EGF</div>
+<div>
+		<div style="padding-top: 10px; padding-bottom: 20px; background-image: url('background.png'); background-size: cover; height: 250px; background-position: left bottom ">
+			<button class="btn" 
+			title="Enter a valid gene name (e.g.: Myc, Mapk1) and click 'Plot protein' to plot the spatio-temporal dynamics. Then, click on
+'Search phosho-sites' to look for identified phosphorylation sites for that protein. Select the phosphosite of interest in the drop-down list and click 'Plot phospho-site'">i</button>
+			<div style="text-align:center">
+				<span>Insert a valid gene name</span></div>
+			<div style="text-align:center">
+				<input type="text" id="gene_name_prot" placeholder="e.g. EGFR" style="font-size:20px; width: 180px"></div>
+			<div style="text-align:center">
+				<button class="selectbtn" onclick="plot_prot()">Plot protein</button> 
+				<button class="selectbtn" onclick="search_phos()">Search phospho-sites</button> </div>
+			<div style="text-align:center">
+				<span style= "margin-left:40px">Select a phosphorylation site</span></div>
+			<div style="text-align:center">
+				<select class="form-control"  id='secondList' name='secondList'></select></div>
+			<div style="text-align:center">
+				<button class="selectbtn" onclick="plot_phos()">Plot phospho-site</button> </div>			
+		</div>
+		<div class="header_2" id="title_prot"></div>
+		<h2 id="message_prot"> </h2>
+				<div style="height: 35vh">
+						<div class="column">
+							<canvas id="bar_chart" width=1 height=1></canvas></div>
+						<div class="column">
+							<canvas id="bar_chart2" width=1 height=1></canvas></div>
+						<div class="column">
+							<canvas id="bar_chart3" width=1 height=1></canvas></div>
+						<div class="column">
+							<canvas id="bar_chart4" width=1 height=1></canvas></div>
+						<div class="column">
+							<canvas id="bar_chart5" width=1 height=1></canvas></div>
+						<div class="column">
+							<canvas id="bar_chart6" width=1 height=1></canvas></div>
+						<div class="container">
+							<img id="legend" src="legend.png" style="visibility: hidden; float: right"></img></div>
+				</div>
+		<div class="header_2" id="title_phos"></div>
+		<h2 id="message_phos"> </h2>	
+				<div id="phos_charts" style="height: 35vh;">
+					<div class="column">
+						<canvas id="bar_chart_phos" width=1 height=1></canvas></div>
+					<div class="column">
+						<canvas id="bar_chart2_phos" width=1 height=1></canvas></div>
+					<div class="column">
+						<canvas id="bar_chart3_phos" width=1 height=1></canvas></div>
+					<div class="column">
+						<canvas id="bar_chart4_phos" width=1 height=1></canvas></div>
+					<div class="column">
+						<canvas id="bar_chart5_phos" width=1 height=1></canvas></div>
+					<div class="column">
+						<canvas id="bar_chart6_phos" width=1 height=1></canvas></div>
+					<div class="container">
+						<img id="legend_phos" src="legend.png" style="visibility: hidden; float: right"></img></div>
+			</div>			
+</div>
+<div>
+	<footer style="text-align: center">
+	<small>Developed by Ana Martinez-Val, 2020</small></footer>
+</div>
+</body>
+<script>
+
+				
+				//PROTEOME
+				var mydatasets_CTRL_prot = [];
+				var mydatasets_1_prot = [];
+				var mydatasets_2_prot = [];
+				var mydatasets_3_prot = [];
+				var mydatasets_4_prot = [];
+
+				var message_prot = document.getElementById("message_prot");
+
+				function plot_prot(){
+				mydatasets_CTRL_prot = [];
+				mydatasets_1_prot = [];
+				mydatasets_2_prot = [];
+				mydatasets_3_prot = [];
+				mydatasets_4_prot = [];				
+
+					var genename_prot = document.getElementById("gene_name_prot").value;
+					var img= document.getElementById('legend');
+					console.log(genename_prot)
+					//document.getElementById("gene_name_prot").value="";
+					for(var k = 0; k < mydata_CTRL.datasets.length; k++) {
+						var gene_name_list_prot = mydata_CTRL.datasets[k].genenames;
+						if(genename_prot.toLowerCase() == gene_name_list_prot.toLowerCase() && genename_prot != ""){
+							console.log("MATCH!")
+							title_prot.innerHTML=["PROTEOME TIME COURSE"];
+							message_prot.innerHTML=["PROTEOME PROFILE OF: "+genename_prot.toUpperCase()];
+							img.style.visibility = 'visible';
+							//NEW SCRIPT
+								const data = [
+									{
+										label: "CTRL",
+										dataset: mydata_CTRL.datasets[k].data,
+										sdValues: mydata_sd_CTRL.datasets[k].sd,
+										plot: mydatasets_CTRL_prot
+									},
+									{
+										label: "EGF+2min",
+										dataset: mydata_2min.datasets[k].data,
+										sdValues: mydata_sd_2min.datasets[k].sd,
+										plot: mydatasets_1_prot
+									},
+									{
+										label: "EGF+8min",
+										dataset: mydata_8min.datasets[k].data,
+										sdValues: mydata_sd_8min.datasets[k].sd,
+										plot: mydatasets_2_prot
+									},
+									{
+										label: "EGF+20min",
+										dataset: mydata_20min.datasets[k].data,
+										sdValues: mydata_sd_20min.datasets[k].sd,
+										plot: mydatasets_3_prot
+									},
+									{
+										label: "EGF+90min",
+										dataset: mydata_90min.datasets[k].data,
+										sdValues: mydata_sd_90min.datasets[k].sd,
+										plot: mydatasets_4_prot
+									}
+								]
+
+								var max
+
+								for (const fraction of data) {
+
+									const errorBars = {}
+									for (const key of Object.keys(fraction.sdValues)) {
+										const value = fraction.sdValues[key]
+										errorBars[key] = { plus: value, minus: value }
+									}
+									fraction.plot.push({ label: fraction.label, data: fraction.dataset, spanGraphs: true, borderWidth: 1, borderColor:"black", backgroundColor: ["red", "orange", "lightgreen", "darkgreen", "blue", "darkblue"], fill: false, tableColor: 'rgba(241, 169, 160, 1)', errorBars: errorBars });
+								//console.log(errorBars)
+
+									const valMax = Math.max(...Object.values(fraction.dataset))
+									const devMac = Math.max(...Object.values(fraction.sdValues))
+									const fracMax = valMax + devMac
+
+									if (!max || fracMax > max)
+										max = fracMax
+								}
+									
+								break;
+							//END NEW PART
+						} 
+						//else if(genename_prot ==""){message_prot.innerHTML="Enter a valid gene name"}
+						else {
+							if(genename_prot ==""){message_prot.innerHTML="Enter a valid gene name"}
+							else{
+							mydatasets_CTRL_prot = [];
+				            mydatasets_1_prot = [];
+				            mydatasets_2_prot = [];
+				            mydatasets_3_prot = [];
+				            mydatasets_4_prot = [];	
+
+							message_prot.innerHTML=["NO DATA FOR THIS PROTEIN:"+genename_prot.toUpperCase()];}
+							//document.getElementById('secondList').innerHTML="";
+						}
+					}
+					
+					//var mydatasets_FR1_prot_data=mydata_FR1.datasets[k].data;
+					//var max= Math.max.apply(Math,mydata_FR1.datasets[k].data)
+					console.log(mydata_CTRL.labels);
+					console.log(max);
+					console.log(k);
+					var plot_labels=["FR1", "FR2", "FR3", "FR4", "FR5", "FR6"];
+					var ctx = document.getElementById("bar_chart").getContext('2d');
+					var ctx2 = document.getElementById("bar_chart2").getContext('2d');
+					var ctx3 = document.getElementById("bar_chart3").getContext('2d');
+					var ctx4 = document.getElementById("bar_chart4").getContext('2d');
+					var ctx5 = document.getElementById("bar_chart5").getContext('2d');
+	
+
+
+					var subjectsData = {
+						labels: plot_labels,
+						datasets: mydatasets_CTRL_prot
+					}
+					var subjectsData2 = {
+						labels: plot_labels,
+						datasets: mydatasets_1_prot
+					}
+					var subjectsData3 = {
+						labels: plot_labels,
+						datasets: mydatasets_2_prot
+					}					
+					var subjectsData4 = {
+						labels: plot_labels,
+						datasets: mydatasets_3_prot
+					}
+					var subjectsData5 = {
+						labels: plot_labels,
+						datasets: mydatasets_4_prot
+					}
+
+
+					var myChart = new Chart(ctx, {
+						type: 'bar',
+						data: subjectsData,
+						options: {
+							title: {
+									display: true,
+									text: 'CTRL',
+									fontSize: 15,
+								},
+							events: [],
+									legend: {display: false},
+									tooltips: {enabled: false},
+									scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+										}
+									}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+										},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+										}
+									}]
+							},
+							plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}}
+					});
+					var myChart2 = new Chart(ctx2, {
+						type: 'bar',
+						data: subjectsData2,
+						options: {
+							title: {
+									display: true,
+									text: '2min',
+									fontSize: 15,
+								},
+							events: [],
+									legend: {display: false},
+									tooltips: {enabled: false},
+									scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+										}
+									}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+										},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+										}
+									}]
+							},
+							plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}}
+
+					});
+					var myChart3 = new Chart(ctx3, {
+						type: 'bar',
+						data: subjectsData3,
+						options: {
+							title: {
+									display: true,
+									fontSize: 15,
+									text: '8min'
+								},
+							events: [],
+							legend: {display: false},
+							tooltips: {enabled: false},
+							scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+													}
+										}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+													},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+												}
+										}]
+									},
+								plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}	
+								}	
+
+					});
+					var myChart4 = new Chart(ctx4, {
+						type: 'bar',
+						data: subjectsData4,
+						options: {
+							title: {
+									display: true,
+									fontSize: 15,
+									text: '20min'
+								},
+							events: [],
+									legend: {display: false},
+									tooltips: {enabled: false},
+									scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+										}
+									}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+										},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+										}
+									}]
+							},
+							plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}}
+
+					});
+					var myChart5 = new Chart(ctx5, {
+						type: 'bar',
+						data: subjectsData5,
+						options: {
+							title: {
+									display: true,
+									fontSize: 15,
+									text: '90min'
+								},
+							events: [],
+									legend: {display: false},
+									tooltips: {enabled: false},
+									scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+										}
+									}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+										},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+										}
+									}]
+							},
+							plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}}
+
+					});
+
+				}
+
+
+				//PHOSPHOPROTEOME
+				var mydatasets_CTRL_phos = [];
+				var mydatasets_1_phos = [];
+				var mydatasets_2_phos = [];
+				var mydatasets_3_phos = [];
+				var mydatasets_4_phos = [];
+
+				var message_phos = document.getElementById("message_phos");
+				var sites_phos=document.getElementById("sites_phos");
+				var list1 = document.getElementById('secondList');
+				var phos_charts= document.getElementById('phos_charts');
+
+				list1.options[0] = new Option('--Select--', '');
+
+				function search_phos() {
+					phos_charts.style.visibility = 'hidden';
+					mydatasets_CTRL_phos = [];
+					mydatasets_1_phos = [];
+					mydatasets_2_phos = [];
+					mydatasets_3_phos = [];
+					mydatasets_4_phos = [];
+
+					var genename_phos = document.getElementById("gene_name_prot").value;
+					console.log(genename_phos);
+					var color=0.1;
+					var hit=0;
+					document.getElementById('secondList').innerHTML="";
+					//document.getElementById("gene_name_phos").value="";
+					var list_num=0;
+					for(var k = 0; k < mydata_phos_CTRL.datasets.length; k++){
+						var gene_name_list_phos = mydata_phos_CTRL.datasets[k].genenames;
+						if(genename_phos.toLowerCase() == gene_name_list_phos.toLowerCase()){
+						list1.options[list_num] = new Option(mydata_phos_CTRL.datasets[k].site, mydata_phos_CTRL.datasets[k].site);
+						list_num=list_num+1;
+						hit=hit+1;
+						}
+						else {
+							if(hit>=1){message_phos.innerHTML=""}
+							else if(genename_phos ==""){message_phos.innerHTML="Enter a valid gene name"}
+							else{message_phos.innerHTML=["NO PHOSPHO DATA FOR THIS PROTEIN:"+genename_phos.toUpperCase()]}
+							//document.getElementById('secondList').innerHTML="";
+						}
+						
+					}
+				}	
+				
+				function plot_phos(){
+				mydatasets_CTRL_phos = [];
+				mydatasets_1_phos = [];
+				mydatasets_2_phos = [];
+				mydatasets_3_phos = [];
+				mydatasets_4_phos = [];				
+
+					var list1 = document.getElementById("secondList");
+					var SelectedSite = list1.options[list1.selectedIndex].value;
+					var genename_phos = document.getElementById("gene_name_prot").value;
+					var img= document.getElementById('legend_phos');
+					phos_charts.style.visibility = 'visible';
+
+					for(var k = 0; k < mydata_phos_CTRL.datasets.length; k++) {
+						var gene_name_list_phos = mydata_phos_CTRL.datasets[k].genenames;
+						if(genename_phos.toLowerCase() == gene_name_list_phos.toLowerCase() && SelectedSite == mydata_phos_CTRL.datasets[k].site){
+							title_phos.innerHTML=["PHOSPHO-PROTEOME TIME COURSE"];
+							message_phos.innerHTML=[genename_phos.toUpperCase()+" "+SelectedSite];
+							img.style.visibility = 'visible';
+							//NEW SCRIPT
+								const data = [
+									{
+										label: "CTRL",
+										dataset: mydata_phos_CTRL.datasets[k].data,
+										sdValues: mydata_phos_sd_CTRL.datasets[k].sd,
+										plot: mydatasets_CTRL_phos
+									},
+									{
+										label: "EGF+2min",
+										dataset: mydata_phos_2min.datasets[k].data,
+										sdValues: mydata_phos_sd_2min.datasets[k].sd,
+										plot: mydatasets_1_phos
+									},
+									{
+										label: "EGF+8min",
+										dataset: mydata_phos_8min.datasets[k].data,
+										sdValues: mydata_phos_sd_8min.datasets[k].sd,
+										plot: mydatasets_2_phos
+									},
+									{
+										label: "EGF+20min",
+										dataset: mydata_phos_20min.datasets[k].data,
+										sdValues: mydata_phos_sd_20min.datasets[k].sd,
+										plot: mydatasets_3_phos
+									},
+									{
+										label: "EGF+90min",
+										dataset: mydata_phos_90min.datasets[k].data,
+										sdValues: mydata_phos_sd_90min.datasets[k].sd,
+										plot: mydatasets_4_phos
+									}
+								]
+
+								var max
+
+								for (const fraction of data) {
+
+									const errorBars = {}
+									for (const key of Object.keys(fraction.sdValues)) {
+										const value = fraction.sdValues[key]
+										errorBars[key] = { plus: value, minus: value }
+									}
+									fraction.plot.push({ label: fraction.label, data: fraction.dataset, spanGraphs: true, borderWidth: 1, borderColor:"black", backgroundColor: ["red", "orange", "lightgreen", "darkgreen", "blue", "darkblue"], fill: false, tableColor: 'rgba(241, 169, 160, 1)', errorBars: errorBars });
+								console.log(errorBars)
+
+									const valMax = Math.max(...Object.values(fraction.dataset))
+									const devMac = Math.max(...Object.values(fraction.sdValues))
+									const fracMax = valMax + devMac
+
+									if (!max || fracMax > max)
+										max = fracMax
+								}
+									
+								break;
+							//END NEW PART
+						}
+					}
+
+					console.log(max);
+					var ctx = document.getElementById("bar_chart_phos").getContext('2d');
+					var ctx2 = document.getElementById("bar_chart2_phos").getContext('2d');
+					var ctx3 = document.getElementById("bar_chart3_phos").getContext('2d');
+					var ctx4 = document.getElementById("bar_chart4_phos").getContext('2d');
+					var ctx5 = document.getElementById("bar_chart5_phos").getContext('2d');
+					var plot_labels=["FR1", "FR2", "FR3", "FR4", "FR5", "FR6"];
+
+					var subjectsData = {
+						labels: plot_labels,
+						datasets: mydatasets_CTRL_phos
+					}
+					var subjectsData2 = {
+						labels: plot_labels,
+						datasets: mydatasets_1_phos
+					}
+ 
+					var subjectsData3 = {
+						labels: plot_labels,
+						datasets: mydatasets_2_phos
+					}
+					
+					var subjectsData4 = {
+						labels: plot_labels,
+						datasets: mydatasets_3_phos
+					}
+
+					var subjectsData5 = {
+						labels: plot_labels,
+						datasets: mydatasets_4_phos
+					}
+
+					var myChart = new Chart(ctx, {
+						type: 'bar',
+						data: subjectsData,
+						options: {events: [],
+									legend: {display: false},
+									tooltips: {enabled: false},
+									scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+										}
+									}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+										},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+										}
+									}]
+							},
+							plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}}
+					});
+					var myChart2 = new Chart(ctx2, {
+						type: 'bar',
+						data: subjectsData2,
+						options: {events: [],
+									legend: {display: false},
+									tooltips: {enabled: false},
+									scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+										}
+									}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+										},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+										}
+									}]
+							},
+							plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}}
+
+					});
+					var myChart3 = new Chart(ctx3, {
+						type: 'bar',
+						data: subjectsData3,
+						options: {
+							events: [],
+							legend: {display: false},
+							tooltips: {enabled: false},
+							scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+													}
+										}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+													},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+												}
+										}]
+									},
+								plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}	
+								}	
+
+					});
+					var myChart4 = new Chart(ctx4, {
+						type: 'bar',
+						data: subjectsData4,
+						options: {events: [],
+									legend: {display: false},
+									tooltips: {enabled: false},
+									scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+										}
+									}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+										},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+										}
+									}]
+							},
+							plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}}
+
+					});
+					var myChart5 = new Chart(ctx5, {
+						type: 'bar',
+						data: subjectsData5,
+						options: {events: [],
+									legend: {display: false},
+									tooltips: {enabled: false},
+									scales: {
+								xAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+										}
+									}],
+								yAxes: [{
+										display: true,
+										scaleLabel: {
+											display: true,
+											labelString: 'Intensity (a.u.)'
+										},
+										ticks: {
+											beginAtZero: false,
+											steps: 10,
+											stepValue: 1,
+											suggestedMax: max+1000,
+											suggestedMin: 0
+										}
+									}]
+							},
+							plugins: {
+         							 chartJsPluginErrorBars: {
+            						width: '60%',
+         						 	}}}
+
+					});
+				}
+				
+</script>
+
+</html>
